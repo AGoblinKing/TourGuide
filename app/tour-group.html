@@ -1,0 +1,74 @@
+<polymer-element name="tour-group" attributes="name editable">
+    <template>
+        <style>
+            .small { width: 50px; }
+        </style>
+        <h1>{{name}} - Days: <input  class="small" type="text" value="{{numDays}}"></h1>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <template repeat="{{day in days}}">
+                    <th>Day {{day + 1}}</th>
+                </template>
+            </tr>
+        <template repeat="{{member, i in members}}">
+            <tr>
+            <td><button on-click="{{removeMember}}" toRemove="{{member.name}}">-</button></td>  
+            <td><input type="text" value="{{member}}"/></td>
+            <template repeat="{{day in days}}">
+                <td>{{(i + day * 2) % members.length + 1}}</td>
+            </template>
+             
+            </tr>
+        </template>
+        <template if="{{editable}}">
+            <tr>
+            <td><button on-click="{{addMember}}">+</button></td>
+            <td><input type="text" value="{{member}}" id="adder" on-keypress="{{checkEnter}}"/></td>
+            </tr>
+        </template>
+            </table>
+    </template>
+    <script>
+        Polymer("tour-group", {
+            editable: true,
+            numDays: 10,
+            numDaysChanged : function() {
+                this.days = [];
+                for(var i = 0; i < this.numDays; i++) {
+                    this.days.push(i);    
+                }
+            },
+            getStorage: function() {
+                var store  = window.localStorage[this.name];
+                if(store) {
+                    return JSON.parse(store);
+                } else {
+                    return false;    
+                }
+            },
+            checkEnter : function(e) {
+                if(e.which === 13) {
+                    this.addMember();       
+                }
+            },
+            setStorage : function() {
+                window.localStorage[this.name] = JSON.stringify(this.members);        
+            },
+            removeMember: function(e) {
+                var name = e.target.toRemove;
+                this.members.splice(this.members.indexOf(name), 1);
+            },
+            addMember: function() {
+                this.members.push(this.$.adder.value);
+                this.setStorage();
+                this.$.adder.value = "";
+            },
+            ready: function() {
+                this.members = this.getStorage() || [];
+                this.numDaysChanged();
+            }
+        });
+    </script>
+</polymer-element>
