@@ -3,7 +3,7 @@
         <style>
             .small { width: 50px; }
         </style>
-        <h1>{{name}} - Days: <input  class="small" type="text" value="{{numDays}}"></h1>
+        <h1>{{name}} - Days: <input  class="small" type="text" value="{{numDays}}"> Move By: <input class="small" type="text" value="{{numMoves}}"/></h1>
         <table class="table table-striped">
             <tr>
                 <th></th>
@@ -17,7 +17,7 @@
             <td><button on-click="{{removeMember}}" toRemove="{{member.name}}">-</button></td>  
             <td><input type="text" value="{{member}}"/></td>
             <template repeat="{{day in days}}">
-                <td>{{(i + day * 2) % members.length + 1}}</td>
+                <td>{{(i + day * numMoves) % members.length + 1}}</td>
             </template>
              
             </tr>
@@ -34,6 +34,7 @@
         Polymer("tour-group", {
             editable: true,
             numDays: 10,
+            numMoves: 2,
             numDaysChanged : function() {
                 this.days = [];
                 for(var i = 0; i < this.numDays; i++) {
