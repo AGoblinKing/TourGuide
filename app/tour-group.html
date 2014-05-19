@@ -2,6 +2,13 @@
     <template>
         <style>
             .small { width: 50px; }
+            @media all {
+                .page-break	{ display: none; }
+            }
+
+            @media print {
+                .page-break	{ display: block; page-break-before: always; }
+            }
         </style>
         <h1>{{name}} - Days: <input  class="small" type="text" value="{{numDays}}"> Move By: <input class="small" type="text" value="{{numMoves}}"/></h1>
         <table class="table table-striped">
@@ -29,17 +36,48 @@
             </tr>
         </template>
             </table>
+        
+        <template repeat="{{day in days}}">
+            <div class="page-break"></div>
+            <h1>Day {{day + 1}}</h1>
+            <table class="table table-striped">
+                <tr>
+                    <th style="width: 15px">Seat</th>
+                    <th>Name</th>
+                </tr>
+            <template repeat="{{member, i in memberDays[day]}}">
+              
+                    <tr>
+                        <td>{{i + 1}}</td>
+                        <td>{{member}}</td>
+                    </tr>
+               
+            </template>
+             </table>
+        </template>
     </template>
     <script>
         Polymer("tour-group", {
             editable: true,
             numDays: 10,
             numMoves: 2,
+            memberDays: [],
+            makeMemberDays: function() {
+                this.memberDays = [];
+                for(var i = 0; i < this.numDays; i++) {
+                    this.memberDays[i] = [];
+                    for(var m = 0; m < this.members.length; m ++) {
+                        var target = (m + i * this.numMoves) % this.members.length;
+                        this.memberDays[i][m] = this.members[target];    
+                    }
+                }
+            },
             numDaysChanged : function() {
                 this.days = [];
                 for(var i = 0; i < this.numDays; i++) {
                     this.days.push(i);    
                 }
+                this.makeMemberDays();
             },
             getStorage: function() {
                 var store  = window.localStorage[this.name];
@@ -60,11 +98,13 @@
             removeMember: function(e) {
                 var name = e.target.toRemove;
                 this.members.splice(this.members.indexOf(name), 1);
+                this.makeMemberDays();
             },
             addMember: function() {
                 this.members.push(this.$.adder.value);
                 this.setStorage();
                 this.$.adder.value = "";
+                this.makeMemberDays();  
             },
             ready: function() {
                 this.members = this.getStorage() || [];
