@@ -22,7 +22,7 @@
         <template repeat="{{member, i in members}}">
             <tr>
             <td><button on-click="{{removeMember}}" toRemove="{{member.name}}">-</button></td>  
-            <td><input type="text" value="{{member}}" data-num="{{i}}" on-keypress="{{updateModel}}"/></td>
+            <td><input type="text" value="{{member}}" data-num="{{i}}" on-change="{{updateModel}}"/></td>
             <template repeat="{{day in days}}">
                 <td>{{(i + day * numMoves) % members.length + 1}}</td>
             </template>
@@ -62,8 +62,10 @@
             numDays: window.localStorage["numDays"] || 10,
             numMoves: window.localStorage["numMoves"] || 2,
             memberDays: [],
-            updateModel: function() {
-               this  
+            updateModel: function(e) {
+                this.members[e.target.getAttribute("data-num")] = e.target.value;
+                this.setStorage();
+                this.makeMemberDays();
             },
             makeMemberDays: function() {
                 this.memberDays = [];
