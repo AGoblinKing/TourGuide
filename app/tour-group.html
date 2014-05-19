@@ -59,8 +59,8 @@
     <script>
         Polymer("tour-group", {
             editable: true,
-            numDays: 10,
-            numMoves: 2,
+            numDays: window.localStorage["numDays"] || 10,
+            numMoves: window.localStorage["numMoves"] || 2,
             memberDays: [],
             makeMemberDays: function() {
                 this.memberDays = [];
@@ -72,11 +72,15 @@
                     }
                 }
             },
+            numMovesChanged : function() {
+                window.localStorage["numMoves"] = this.numMoves;    
+            },
             numDaysChanged : function() {
                 this.days = [];
                 for(var i = 0; i < this.numDays; i++) {
                     this.days.push(i);    
                 }
+                window.localStorage["numDays"] = this.numDays;
                 this.makeMemberDays();
             },
             getStorage: function() {
